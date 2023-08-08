@@ -93,6 +93,7 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
   }
 
   // temp fix
+  // TODO: replace the pool address
   if (Address.fromString(position.pool).equals(Address.fromHexString('0x8fe8d9bb8eeba3ed688069c3d6b556c9ca258248'))) {
     return
   }
@@ -100,22 +101,23 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
   let token0 = Token.load(position.token0)
   let token1 = Token.load(position.token1)
 
-  let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
-  let amount1 = convertTokenToDecimal(event.params.amount1, token1.decimals)
+  let amount0 = convertTokenToDecimal(event.params.amount0, token0!.decimals)
+  let amount1 = convertTokenToDecimal(event.params.amount1, token1!.decimals)
 
   position.liquidity = position.liquidity.plus(event.params.liquidity)
   position.depositedToken0 = position.depositedToken0.plus(amount0)
   position.depositedToken1 = position.depositedToken1.plus(amount1)
 
-  updateFeeVars(position!, event, event.params.tokenId)
+  updateFeeVars(position, event, event.params.tokenId)
 
   position.save()
 
-  savePositionSnapshot(position!, event)
+  savePositionSnapshot(position, event)
 }
 
 export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
   // temp fix
+  // TODO: see what this does
   if (event.block.number == BigInt.fromI32(14317993)) {
     return
   }
@@ -128,22 +130,23 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
   }
 
   // temp fix
+  // TODO: replace the pool address
   if (Address.fromString(position.pool).equals(Address.fromHexString('0x8fe8d9bb8eeba3ed688069c3d6b556c9ca258248'))) {
     return
   }
 
   let token0 = Token.load(position.token0)
   let token1 = Token.load(position.token1)
-  let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
-  let amount1 = convertTokenToDecimal(event.params.amount1, token1.decimals)
+  let amount0 = convertTokenToDecimal(event.params.amount0, token0!.decimals)
+  let amount1 = convertTokenToDecimal(event.params.amount1, token1!.decimals)
 
   position.liquidity = position.liquidity.minus(event.params.liquidity)
   position.withdrawnToken0 = position.withdrawnToken0.plus(amount0)
   position.withdrawnToken1 = position.withdrawnToken1.plus(amount1)
 
-  position = updateFeeVars(position!, event, event.params.tokenId)
+  position = updateFeeVars(position, event, event.params.tokenId)
   position.save()
-  savePositionSnapshot(position!, event)
+  savePositionSnapshot(position, event)
 }
 
 export function handleCollect(event: Collect): void {
@@ -152,18 +155,19 @@ export function handleCollect(event: Collect): void {
   if (position == null) {
     return
   }
+  // TODO: replace the pool address
   if (Address.fromString(position.pool).equals(Address.fromHexString('0x8fe8d9bb8eeba3ed688069c3d6b556c9ca258248'))) {
     return
   }
 
   let token0 = Token.load(position.token0)
-  let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
+  let amount0 = convertTokenToDecimal(event.params.amount0, token0!.decimals)
   position.collectedFeesToken0 = position.collectedFeesToken0.plus(amount0)
   position.collectedFeesToken1 = position.collectedFeesToken1.plus(amount0)
 
-  position = updateFeeVars(position!, event, event.params.tokenId)
+  position = updateFeeVars(position, event, event.params.tokenId)
   position.save()
-  savePositionSnapshot(position!, event)
+  savePositionSnapshot(position, event)
 }
 
 export function handleTransfer(event: Transfer): void {
@@ -177,5 +181,5 @@ export function handleTransfer(event: Transfer): void {
   position.owner = event.params.to
   position.save()
 
-  savePositionSnapshot(position!, event)
+  savePositionSnapshot(position, event)
 }
