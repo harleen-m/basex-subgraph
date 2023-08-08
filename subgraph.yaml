@@ -1,5 +1,5 @@
 specVersion: 0.0.5
-description: BaseX is a decentralized protocol for automated token exchange on Base.
+description: Arbidex Quantum is a decentralized protocol for automated token exchange on Arbitrum.
 repository: https://github.com/harleen-m/basex-subgraph
 schema:
   file: ./schema.graphql
@@ -8,11 +8,11 @@ features:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: base
+    network: arbitrum-one
     source:
-      address: '0x7af75d2c6445fb3d9b41d1574070826cda3d4a7e'
+      address: '0x855f2c70cf5cb1d56c15ed309a4dfefb88ed909e'
       abi: Factory
-      startBlock: 1
+      startBlock: 87000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -37,11 +37,11 @@ dataSources:
           handler: handlePoolCreated
   - kind: ethereum/contract
     name: NonfungiblePositionManager
-    network: base
+    network: arbitrum-one
     source:
-      address: '0x20c51b3da2e7821ef62d63a447ac9e5f8a503065'
+      address: '0xc36442b4a4522e871399cd717abdd847ab11fe88'
       abi: NonfungiblePositionManager
-      startBlock: 1
+      startBlock: 87000000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -71,7 +71,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: base
+    network: arbitrum-one
     source:
       abi: Pool
     mapping:

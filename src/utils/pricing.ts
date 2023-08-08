@@ -4,28 +4,27 @@ import { Bundle, Pool, Token } from './../types/schema'
 import { BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { exponentToBigDecimal, safeDiv } from '../utils/index'
 
-const WETH_ADDRESS = '0x4200000000000000000000000000000000000006'
+const WETH_ADDRESS = '0x82af49447d8a07e3bd95bd0d56f35241523fbab1'
 // TODO: replace the pool address
-const USDC_WETH_03_POOL = '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
+const WETH_USDC_03_POOL = '0x48d7e1a9d652ba5f5d80a8dc396df37993659f35'
 
 // token where amounts should contribute to tracked volume and liquidity
 // usually tokens that many tokens are paired with s
 export let WHITELIST_TOKENS: string[] = [
   WETH_ADDRESS, // WETH
-  '0x78a087d713be963bf307b18f2ff8122ef9a63ae9', // BSWAP
-  '0xab8a1c03b8e4e1d21c8ddd6edf9e07f26e843492', // OGRE
-  '0xeb466342c4d449bc9f53a865d5cb90586f405215', // axlUSDC
-  '0x50c5725949a6f0c72e6c4a641f24049a917db0cb', // DAI
-  '0x4a3a6dd60a34bb2aba60d73b4c88315e9ceb6a3d', // MIM
-  '0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca', // USDbC
-  '0x2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22', // cbETH
+  '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1', // DAI
+  '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8', // USDC
+  '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9', // USDT
+  '0xd5954c3084a1ccd70b4da011e67760b8e78aee84', // ARX
+  '0x0d702ebdef2c47eb33951098db4f06bd8cca8105', // CGLD
+  '0x912ce59144191c1204e64559fe8253a0e49e6548', // ARB
+  '0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f', // WBTC
 ]
 
 let STABLE_COINS: string[] = [
-  '0xeb466342c4d449bc9f53a865d5cb90586f405215', // axlUSDC
-  '0x50c5725949a6f0c72e6c4a641f24049a917db0cb', // DAI
-  '0x4a3a6dd60a34bb2aba60d73b4c88315e9ceb6a3d', // MIM
-  '0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca', // USDbC
+  '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1', // DAI
+  '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8', // USDC
+  '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9', // USDT
 ]
 
 let MINIMUM_ETH_LOCKED = BigDecimal.fromString('2')
@@ -45,9 +44,9 @@ export function sqrtPriceX96ToTokenPrices(sqrtPriceX96: BigInt, token0: Token, t
 
 export function getEthPriceInUSD(): BigDecimal {
   // fetch eth prices for each stablecoin
-  let usdcPool = Pool.load(USDC_WETH_03_POOL) // dai is token0
+  let usdcPool = Pool.load(WETH_USDC_03_POOL) // USDC is token1
   if (usdcPool !== null) {
-    return usdcPool.token0Price
+    return usdcPool.token1Price
   } else {
     return ZERO_BD
   }
