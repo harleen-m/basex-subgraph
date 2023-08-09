@@ -329,7 +329,7 @@ export function handleSwap(event: SwapEvent): void {
     return
   }
 
-  let oldTick = pool.tick!
+  let oldTick = pool.tick
 
   // amounts - 0/1 are token deltas: can be positive or negative
   let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
@@ -512,7 +512,10 @@ export function handleSwap(event: SwapEvent): void {
   token1.save()
 
   // Update inner vars of current or crossed ticks
-  let newTick = pool.tick!
+  let newTick = pool.tick
+  if (!newTick) {
+    return
+  }
   let tickSpacing = feeTierToTickSpacing(pool.feeTier)
   let modulo = newTick.mod(tickSpacing)
   if (modulo.equals(ZERO_BI)) {
@@ -520,6 +523,9 @@ export function handleSwap(event: SwapEvent): void {
     loadTickUpdateFeeVarsAndSave(newTick.toI32(), event)
   }
 
+  if (!oldTick) {
+    return
+  }
   let numIters = oldTick
     .minus(newTick)
     .abs()
