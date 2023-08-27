@@ -39,7 +39,7 @@ dataSources:
     name: NonfungiblePositionManager
     network: arbitrum-one
     source:
-      address: '0xc36442b4a4522e871399cd717abdd847ab11fe88'
+      address: '0x81f2c375aedbdf02f11c1ae125e2f51efa777cea'
       abi: NonfungiblePositionManager
       startBlock: 87000000
     mapping:

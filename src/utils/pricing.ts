@@ -1,11 +1,10 @@
 /* eslint-disable prefer-const */
 import { ONE_BD, ZERO_BD, ZERO_BI } from './constants'
 import { Bundle, Pool, Token } from './../types/schema'
-import { BigDecimal, BigInt } from '@graphprotocol/graph-ts'
+import { BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
 import { exponentToBigDecimal, safeDiv } from '../utils/index'
 
 const WETH_ADDRESS = '0x82af49447d8a07e3bd95bd0d56f35241523fbab1'
-// TODO: replace the pool address
 const WETH_USDC_03_POOL = '0x48d7e1a9d652ba5f5d80a8dc396df37993659f35'
 
 // token where amounts should contribute to tracked volume and liquidity
@@ -29,10 +28,10 @@ let STABLE_COINS: string[] = [
 
 let MINIMUM_ETH_LOCKED = BigDecimal.fromString('2')
 
-let Q192 = 2 ** 192
+let Q192 = '100433627766186892221372630771322662657637687111424552206336'
 export function sqrtPriceX96ToTokenPrices(sqrtPriceX96: BigInt, token0: Token, token1: Token): BigDecimal[] {
   let num = sqrtPriceX96.times(sqrtPriceX96).toBigDecimal()
-  let denom = BigDecimal.fromString(Q192.toString())
+  let denom = BigDecimal.fromString(Q192)
   let price1 = num
     .div(denom)
     .times(exponentToBigDecimal(token0.decimals))
@@ -43,7 +42,7 @@ export function sqrtPriceX96ToTokenPrices(sqrtPriceX96: BigInt, token0: Token, t
 }
 
 export function getEthPriceInUSD(): BigDecimal {
-  // fetch eth prices for each stablecoin
+  // fetch eth price for a stablecoin
   let usdcPool = Pool.load(WETH_USDC_03_POOL) // USDC is token1
   if (usdcPool !== null) {
     return usdcPool.token1Price
@@ -66,36 +65,40 @@ export function findEthPerToken(token: Token): BigDecimal {
   let largestLiquidityETH = ZERO_BD
   let priceSoFar = ZERO_BD
   let bundle = Bundle.load('1')
+  if (!bundle) return ZERO_BD
 
   // hardcoded fix for incorrect rates
   // if whitelist includes token - get the safe price
   if (STABLE_COINS.includes(token.id)) {
-    priceSoFar = safeDiv(ONE_BD, bundle!.ethPriceUSD)
+    priceSoFar = safeDiv(ONE_BD, bundle.ethPriceUSD)
   } else {
     for (let i = 0; i < whiteList.length; ++i) {
       let poolAddress = whiteList[i]
       let pool = Pool.load(poolAddress)
+      if (!pool) return ZERO_BD
 
-      if (pool!.liquidity.gt(ZERO_BI)) {
-        if (pool!.token0 == token.id) {
+      if (pool.liquidity.gt(ZERO_BI)) {
+        if (pool.token0 == token.id) {
           // whitelist token is token1
-          let token1 = Token.load(pool!.token1)
+          let token1 = Token.load(pool.token1)
+          if (!token1) return ZERO_BD
           // get the derived ETH in pool
-          let ethLocked = pool!.totalValueLockedToken1.times(token1!.derivedETH)
+          let ethLocked = pool.totalValueLockedToken1.times(token1.derivedETH)
           if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(MINIMUM_ETH_LOCKED)) {
             largestLiquidityETH = ethLocked
             // token1 per our token * Eth per token1
-            priceSoFar = pool!.token1Price.times(token1!.derivedETH as BigDecimal)
+            priceSoFar = pool.token1Price.times(token1.derivedETH as BigDecimal)
           }
         }
-        if (pool!.token1 == token.id) {
-          let token0 = Token.load(pool!.token0)
+        if (pool.token1 == token.id) {
+          let token0 = Token.load(pool.token0)
+          if (!token0) return ZERO_BD
           // get the derived ETH in pool
-          let ethLocked = pool!.totalValueLockedToken0.times(token0!.derivedETH)
+          let ethLocked = pool.totalValueLockedToken0.times(token0.derivedETH)
           if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(MINIMUM_ETH_LOCKED)) {
             largestLiquidityETH = ethLocked
             // token0 per our token * ETH per token0
-            priceSoFar = pool!.token0Price.times(token0!.derivedETH as BigDecimal)
+            priceSoFar = pool.token0Price.times(token0.derivedETH as BigDecimal)
           }
         }
       }
@@ -117,8 +120,9 @@ export function getTrackedAmountUSD(
   token1: Token
 ): BigDecimal {
   let bundle = Bundle.load('1')
-  let price0USD = token0.derivedETH.times(bundle!.ethPriceUSD)
-  let price1USD = token1.derivedETH.times(bundle!.ethPriceUSD)
+  if (!bundle) return ZERO_BD
+  let price0USD = token0.derivedETH.times(bundle.ethPriceUSD)
+  let price1USD = token1.derivedETH.times(bundle.ethPriceUSD)
 
   // both are whitelist tokens, return sum of both amounts
   if (WHITELIST_TOKENS.includes(token0.id) && WHITELIST_TOKENS.includes(token1.id)) {
