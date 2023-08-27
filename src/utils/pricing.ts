@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 import { ONE_BD, ZERO_BD, ZERO_BI } from './constants'
 import { Bundle, Pool, Token } from './../types/schema'
-import { BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
+import { BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { exponentToBigDecimal, safeDiv } from '../utils/index'
 
 const WETH_ADDRESS = '0x82af49447d8a07e3bd95bd0d56f35241523fbab1'
@@ -28,7 +28,7 @@ let STABLE_COINS: string[] = [
 
 let MINIMUM_ETH_LOCKED = BigDecimal.fromString('2')
 
-let Q192 = '100433627766186892221372630771322662657637687111424552206336'
+let Q192 = '6277101735386680763835789423207666416102355444464034512896'
 export function sqrtPriceX96ToTokenPrices(sqrtPriceX96: BigInt, token0: Token, token1: Token): BigDecimal[] {
   let num = sqrtPriceX96.times(sqrtPriceX96).toBigDecimal()
   let denom = BigDecimal.fromString(Q192)
