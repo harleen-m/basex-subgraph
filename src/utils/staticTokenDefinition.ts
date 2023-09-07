@@ -5,7 +5,7 @@ import {
 
 // Initialize a Token Definition with the attributes
 export class StaticTokenDefinition {
-  address : Address
+  address: Address
   symbol: string
   name: string
   decimals: BigInt
@@ -20,19 +20,19 @@ export class StaticTokenDefinition {
 
   // Get all tokens with a static defintion
   static getStaticDefinitions(): Array<StaticTokenDefinition> {
-    let staticDefinitions = new Array<StaticTokenDefinition>(0)
+    const staticDefinitions = new Array<StaticTokenDefinition>(0)
 
     return staticDefinitions
   }
 
   // Helper for hardcoded tokens
   static fromAddress(tokenAddress: Address) : StaticTokenDefinition | null {
-    let staticDefinitions = this.getStaticDefinitions()
-    let tokenAddressHex = tokenAddress.toHexString()
+    const staticDefinitions = this.getStaticDefinitions()
+    const tokenAddressHex = tokenAddress.toHexString()
 
     // Search the definition using the address
     for (let i = 0; i < staticDefinitions.length; i++) {
-      let staticDefinition = staticDefinitions[i]
+      const staticDefinition = staticDefinitions[i]
       if(staticDefinition.address.toHexString() == tokenAddressHex) {
         return staticDefinition
       }

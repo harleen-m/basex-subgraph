@@ -25,9 +25,7 @@ import { createTick, feeTierToTickSpacing } from '../utils/tick'
 export function handleInitialize(event: Initialize): void {
   // update pool sqrt price and tick
   let pool = Pool.load(event.address.toHexString())
-  if (!pool) {
-    return
-  }
+  if (!pool) return
   pool.sqrtPrice = event.params.sqrtPriceX96
   pool.tick = BigInt.fromI32(event.params.tick)
   pool.save()
@@ -35,15 +33,11 @@ export function handleInitialize(event: Initialize): void {
   // update token prices
   let token0 = Token.load(pool.token0)
   let token1 = Token.load(pool.token1)
-  if (!token0 || !token1) {
-    return
-  }
+  if (!token0 || !token1) return
 
   // update ETH price now that prices could have changed
   let bundle = Bundle.load('1')
-  if (!bundle) {
-    return
-  }
+  if (!bundle) return
   bundle.ethPriceUSD = getEthPriceInUSD()
   bundle.save()
 
@@ -59,24 +53,16 @@ export function handleInitialize(event: Initialize): void {
 
 export function handleMint(event: MintEvent): void {
   let bundle = Bundle.load('1')
-  if (!bundle) {
-    return
-  }
+  if (!bundle) return
   let poolAddress = event.address.toHexString()
   let pool = Pool.load(poolAddress)
-  if (!pool) {
-    return
-  }
+  if (!pool) return
   let factory = Factory.load(FACTORY_ADDRESS)
-  if (!factory) {
-    return
-  }
+  if (!factory) return
 
   let token0 = Token.load(pool.token0)
   let token1 = Token.load(pool.token1)
-  if (!token0 || !token1) {
-    return
-  }
+  if (!token0 || !token1) return
   let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
   let amount1 = convertTokenToDecimal(event.params.amount1, token1.decimals)
 
@@ -190,24 +176,16 @@ export function handleMint(event: MintEvent): void {
 
 export function handleBurn(event: BurnEvent): void {
   let bundle = Bundle.load('1')
-  if (!bundle) {
-    return
-  }
+  if (!bundle) return
   let poolAddress = event.address.toHexString()
   let pool = Pool.load(poolAddress)
-  if (!pool) {
-    return
-  }
+  if (!pool) return
   let factory = Factory.load(FACTORY_ADDRESS)
-  if (!factory) {
-    return
-  }
+  if (!factory) return
 
   let token0 = Token.load(pool.token0)
   let token1 = Token.load(pool.token1)
-  if (!token0 || !token1) {
-    return
-  }
+  if (!token0 || !token1) return
   let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
   let amount1 = convertTokenToDecimal(event.params.amount1, token1.decimals)
 
@@ -277,9 +255,7 @@ export function handleBurn(event: BurnEvent): void {
   let upperTickId = poolAddress + '#' + BigInt.fromI32(event.params.tickUpper).toString()
   let lowerTick = Tick.load(lowerTickId)
   let upperTick = Tick.load(upperTickId)
-  if (!lowerTick || !upperTick) {
-    return
-  }
+  if (!lowerTick || !upperTick) return
   let amount = event.params.amount
   lowerTick.liquidityGross = lowerTick.liquidityGross.minus(amount)
   lowerTick.liquidityNet = lowerTick.liquidityNet.minus(amount)
@@ -305,29 +281,18 @@ export function handleBurn(event: BurnEvent): void {
 
 export function handleSwap(event: SwapEvent): void {
   let bundle = Bundle.load('1')
-  if (!bundle) {
-    return
-  }
   let factory = Factory.load(FACTORY_ADDRESS)
-  if (!factory) {
-    return
-  }
   let pool = Pool.load(event.address.toHexString())
-  if (!pool) {
-    return
-  }
+  if (!bundle || !factory || !pool) return
 
-  // TODO: replace the pool address
-  // hot fix for bad pricing
-  if (pool.id == '0x9663f2ca0454accad3e094448ea6f77443880454') {
-    return
-  }
+  // // hot fix for bad pricing
+  // if (pool.id == '0x9663f2ca0454accad3e094448ea6f77443880454') {
+  //   return
+  // }
 
   let token0 = Token.load(pool.token0)
   let token1 = Token.load(pool.token1)
-  if (!token0 || !token1) {
-    return
-  }
+  if (!token0 || !token1) return
 
   let oldTick = pool.tick
 
@@ -513,9 +478,7 @@ export function handleSwap(event: SwapEvent): void {
 
   // Update inner vars of current or crossed ticks
   let newTick = pool.tick
-  if (!newTick) {
-    return
-  }
+  if (!newTick) return
   let tickSpacing = feeTierToTickSpacing(pool.feeTier)
   let modulo = newTick.mod(tickSpacing)
   if (modulo.equals(ZERO_BI)) {
@@ -523,9 +486,7 @@ export function handleSwap(event: SwapEvent): void {
     loadTickUpdateFeeVarsAndSave(newTick.toI32(), event)
   }
 
-  if (!oldTick) {
-    return
-  }
+  if (!oldTick) return
   let numIters = oldTick
     .minus(newTick)
     .abs()
@@ -553,9 +514,7 @@ export function handleSwap(event: SwapEvent): void {
 export function handleFlash(event: FlashEvent): void {
   // update fee growth
   let pool = Pool.load(event.address.toHexString())
-  if (!pool) {
-    return
-  }
+  if (!pool) return
   let poolContract = PoolABI.bind(event.address)
   let feeGrowthGlobal0X128 = poolContract.feeGrowthGlobal0X128()
   let feeGrowthGlobal1X128 = poolContract.feeGrowthGlobal1X128()

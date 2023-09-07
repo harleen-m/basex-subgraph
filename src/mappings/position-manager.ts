@@ -80,10 +80,10 @@ function savePositionSnapshot(position: Position, event: ethereum.Event): void {
 }
 
 export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
-  // temp fix
-  if (event.block.number.equals(BigInt.fromI32(14317993))) {
-    return
-  }
+  // // temp fix
+  // if (event.block.number.equals(BigInt.fromI32(14317993))) {
+  //   return
+  // }
 
   let position = getPosition(event, event.params.tokenId)
 
@@ -92,18 +92,14 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
     return
   }
 
-  // temp fix
-  // TODO: replace the pool address
-  if (Address.fromString(position.pool).equals(Address.fromHexString('0x8fe8d9bb8eeba3ed688069c3d6b556c9ca258248'))) {
-    return
-  }
+  // // temp fix
+  // if (Address.fromString(position.pool).equals(Address.fromHexString('0x8fe8d9bb8eeba3ed688069c3d6b556c9ca258248'))) {
+  //   return
+  // }
 
   let token0 = Token.load(position.token0)
   let token1 = Token.load(position.token1)
-
-  if (!token0 || !token1) {
-    return
-  }
+  if (!token0 || !token1) return
 
   let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
   let amount1 = convertTokenToDecimal(event.params.amount1, token1.decimals)
@@ -120,11 +116,10 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
 }
 
 export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
-  // temp fix
-  // TODO: see what this does
-  if (event.block.number == BigInt.fromI32(14317993)) {
-    return
-  }
+  // // temp fix
+  // if (event.block.number == BigInt.fromI32(14317993)) {
+  //   return
+  // }
 
   let position = getPosition(event, event.params.tokenId)
 
@@ -133,17 +128,14 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
     return
   }
 
-  // temp fix
-  // TODO: replace the pool address
-  if (Address.fromString(position.pool).equals(Address.fromHexString('0x8fe8d9bb8eeba3ed688069c3d6b556c9ca258248'))) {
-    return
-  }
+  // // temp fix
+  // if (Address.fromString(position.pool).equals(Address.fromHexString('0x8fe8d9bb8eeba3ed688069c3d6b556c9ca258248'))) {
+  //   return
+  // }
 
   let token0 = Token.load(position.token0)
   let token1 = Token.load(position.token1)
-  if (!token0 || !token1) {
-    return
-  }
+  if (!token0 || !token1) return
   let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
   let amount1 = convertTokenToDecimal(event.params.amount1, token1.decimals)
 
@@ -162,15 +154,12 @@ export function handleCollect(event: Collect): void {
   if (position == null) {
     return
   }
-  // TODO: replace the pool address
-  if (Address.fromString(position.pool).equals(Address.fromHexString('0x8fe8d9bb8eeba3ed688069c3d6b556c9ca258248'))) {
-    return
-  }
+  // if (Address.fromString(position.pool).equals(Address.fromHexString('0x8fe8d9bb8eeba3ed688069c3d6b556c9ca258248'))) {
+  //   return
+  // }
 
   let token0 = Token.load(position.token0)
-  if (!token0) {
-    return
-  }
+  if (!token0) return
   let amount0 = convertTokenToDecimal(event.params.amount0, token0.decimals)
   position.collectedFeesToken0 = position.collectedFeesToken0.plus(amount0)
   position.collectedFeesToken1 = position.collectedFeesToken1.plus(amount0)

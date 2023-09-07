@@ -44,13 +44,13 @@ export function feeTierToTickSpacing(feeTier: BigInt): BigInt {
   if (feeTier.equals(BigInt.fromI32(10000))) {
     return BigInt.fromI32(200)
   }
-  if (feeTier.equals(BigInt.fromI32(3000))) {
+  if (feeTier.equals(BigInt.fromI32(2500))) {
     return BigInt.fromI32(60)
   }
-  if (feeTier.equals(BigInt.fromI32(500))) {
+  if (feeTier.equals(BigInt.fromI32(450))) {
     return BigInt.fromI32(10)
   }
-  if (feeTier.equals(BigInt.fromI32(100))) {
+  if (feeTier.equals(BigInt.fromI32(80))) {
     return BigInt.fromI32(1)
   }
 
